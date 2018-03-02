@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">QuestionApp</string>
+    <string name="question1">How did you know about us</string>
+    <string name="question2">How often do you use our service</string>
+    <string name="sampleVal">Sample Value</string>
+    <string name="edit_message">Enter a message</string>
+    <string name="custom_answer">Другой ответ</string>
+</resources>
