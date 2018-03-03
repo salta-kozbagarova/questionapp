@@ -2,6 +2,7 @@ package com.salikhanova.questionapp.dao;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
 
 import com.salikhanova.questionapp.entity.QuestionAnswer;
 
@@ -13,4 +14,7 @@ public interface QuestionAnswerDao {
 
     @Insert
     void insertAll(QuestionAnswer... questionAnswers);
+
+    @Query("DELETE FROM questionanswer")
+    void cleanTable();
 }

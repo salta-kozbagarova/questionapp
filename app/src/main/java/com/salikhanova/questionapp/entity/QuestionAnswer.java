@@ -19,7 +19,7 @@ import android.arch.persistence.room.PrimaryKey;
         indices = {@Index("question_id"), @Index("answer_id")})
 public class QuestionAnswer {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "question_id")
