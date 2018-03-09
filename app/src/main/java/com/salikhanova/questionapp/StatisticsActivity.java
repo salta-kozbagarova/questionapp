@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,6 +19,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.salikhanova.questionapp.database.AppDatabase;
+import com.salikhanova.questionapp.entity.Answer;
 import com.salikhanova.questionapp.entity.Question;
 import com.salikhanova.questionapp.entity.QuestionAnswer;
 
@@ -31,15 +34,24 @@ public class StatisticsActivity extends AppCompatActivity {
     HashMap datas = new HashMap();
     List<PieEntry> entries = new ArrayList<>();
     AppDatabase db;
-    List<QuestionAnswer> qaList = new ArrayList<>();
+    List<QuestionAnswer> qaList;
+    List<Question> questions;
+    List<Answer> answers = new ArrayList<>();
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-        // in this example, a LineChart is initialized from xml
-        pieChart = (PieChart) findViewById(R.id.chart);
         db = AppDatabase.getDatabase(this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
+
+//        qaList = new ArrayList<>();
+//        questions = new ArrayList<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -47,11 +59,24 @@ public class StatisticsActivity extends AppCompatActivity {
                 try {
                     //rePopulateDb();
                     qaList = db.questionAnswerDao().getAll();
+                    questions = db.questionDao().getAll();
+                    answers = db.answerDao().getAll();
+                    //customAnswer.setText(msg + questions.size());
+                    for(Question q : questions){
+                        q.setAnswers(db.answerDao().getAllByQuestionId(q.getId()));
+                    }
                     Log.d("Retrieving qa data", "sdcvsdcsdcsd " + qaList.size());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            drawChart();
+                            Log.d("Retrieving qa data", "running on ui thread");
+                            //drawChart();
+                            mAdapter = new StatisticsAdapter(StatisticsActivity.this, qaList, questions);
+                            mLayoutManager = new GridLayoutManager(StatisticsActivity.this, 1);
+                            mRecyclerView.setLayoutManager(mLayoutManager);
+                            //recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
+                            //recyclerView.setItemAnimator(new DefaultItemAnimator());
+                            mRecyclerView.setAdapter(mAdapter);
                         }
                     });
                 }catch (Exception e){
@@ -61,7 +86,87 @@ public class StatisticsActivity extends AppCompatActivity {
         }).start();
 
 
+
+        //prepareAlbums();
+
+        // in this example, a LineChart is initialized from xml
+        //pieChart = (PieChart) findViewById(R.id.chart);
+
     }
+
+    /**
+     * Adding few albums for testing
+     */
+    private void prepareAlbums() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+            String msg = "Exception ";
+            try {
+                //rePopulateDb();
+                qaList = db.questionAnswerDao().getAll();
+                questions = db.questionDao().getAll();
+                Log.d("Retrieving qa data", "sdcvsdcsdcsd " + qaList.size());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("Retrieving qa data", "running on ui thread");
+                        //drawChart();
+                        mAdapter.notifyDataSetChanged();
+                    }
+                });
+            }catch (Exception e){
+                Log.d("Retrieving data", msg + e.getMessage());
+            }
+            }
+        }).start();
+    }
+
+    /**
+     * RecyclerView item decoration - give equal margin around grid item
+     */
+//    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+//
+//        private int spanCount;
+//        private int spacing;
+//        private boolean includeEdge;
+//
+//        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+//            this.spanCount = spanCount;
+//            this.spacing = spacing;
+//            this.includeEdge = includeEdge;
+//        }
+//
+//        @Override
+//        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+//            int position = parent.getChildAdapterPosition(view); // item position
+//            int column = position % spanCount; // item column
+//
+//            if (includeEdge) {
+//                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+//                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+//
+//                if (position < spanCount) { // top edge
+//                    outRect.top = spacing;
+//                }
+//                outRect.bottom = spacing; // item bottom
+//            } else {
+//                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+//                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+//                if (position >= spanCount) {
+//                    outRect.top = spacing; // item top
+//                }
+//            }
+//        }
+//    }
+
+    /**
+     * Converting dp to pixel
+     */
+//    private int dpToPx(int dp) {
+//        Resources r = getResources();
+//        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
+//    }
 
     private void drawChart(){
         List<Integer> answers = new ArrayList<>();

@@ -23,7 +23,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     Button answer1, answer2, answer3, answer4, answer5, acceptBtn;
     Button[] answersBtn;
-    TextView question;
+    TextView question, customAnswerLabel;
     EditText customAnswer;
     AppDatabase db;
     List<Question> questions = new ArrayList<>();
@@ -44,7 +44,8 @@ public class QuestionActivity extends AppCompatActivity {
         answer4 = (Button) findViewById(R.id.answer4);
         answer5 = (Button) findViewById(R.id.answer5);
         acceptBtn = (Button) findViewById(R.id.accept_btn);
-        customAnswer = (EditText) findViewById(R.id.customAnswer1);
+        customAnswer = (EditText) findViewById(R.id.custom_answer);
+        customAnswerLabel = (TextView) findViewById(R.id.custom_answer_label);
         answersBtn = new Button[]{answer1, answer2, answer3, answer4, answer5};
 
         db = AppDatabase.getDatabase(this);
@@ -146,11 +147,13 @@ public class QuestionActivity extends AppCompatActivity {
                 answer5.setVisibility(View.INVISIBLE);
                 customAnswer.setVisibility(View.VISIBLE);
                 acceptBtn.setVisibility(View.VISIBLE);
+                customAnswerLabel.setVisibility(View.VISIBLE);
                 acceptBtn.setTag(R.string.quest,questions.get(questionIndex).getId());
             } else if(questionIndex > 0){
                 answer5.setVisibility(View.VISIBLE);
                 customAnswer.setVisibility(View.INVISIBLE);
                 acceptBtn.setVisibility(View.INVISIBLE);
+                customAnswerLabel.setVisibility(View.INVISIBLE);
             }
             question.setText(questions.get(questionIndex).getText());
             Question curQuest = questions.get(questionIndex);

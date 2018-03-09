@@ -20,6 +20,9 @@ public interface QuestionAnswerDao {
     @Query("SELECT * FROM questionanswer WHERE id = :id")
     QuestionAnswer getById(int id);
 
+    @Query("SELECT * FROM questionanswer WHERE question_id = :question_id")
+    List<QuestionAnswer> getByQuestionId(int question_id);
+
     @Insert
     void insertAll(QuestionAnswer... questionAnswers);
 
