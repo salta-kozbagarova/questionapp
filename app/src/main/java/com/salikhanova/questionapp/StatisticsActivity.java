@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,6 +24,7 @@ import com.salikhanova.questionapp.database.AppDatabase;
 import com.salikhanova.questionapp.entity.Answer;
 import com.salikhanova.questionapp.entity.Question;
 import com.salikhanova.questionapp.entity.QuestionAnswer;
+import com.salikhanova.questionapp.entity.QuestionCustomAnswer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,11 +34,11 @@ import java.util.List;
 public class StatisticsActivity extends AppCompatActivity {
 
     PieChart pieChart;
-    HashMap datas = new HashMap();
     List<PieEntry> entries = new ArrayList<>();
     AppDatabase db;
     List<QuestionAnswer> qaList;
     List<Question> questions;
+    List<QuestionCustomAnswer> customAnswers;
     List<Answer> answers = new ArrayList<>();
 
     private RecyclerView mRecyclerView;
@@ -49,9 +52,6 @@ public class StatisticsActivity extends AppCompatActivity {
         db = AppDatabase.getDatabase(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-
-//        qaList = new ArrayList<>();
-//        questions = new ArrayList<>();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -61,9 +61,17 @@ public class StatisticsActivity extends AppCompatActivity {
                     qaList = db.questionAnswerDao().getAll();
                     questions = db.questionDao().getAll();
                     answers = db.answerDao().getAll();
+                    customAnswers = db.questionCustomAnswerDao().getAll();
+                    List<String> customAnswersList = new ArrayList<>();
+                    for(QuestionCustomAnswer qca : customAnswers){
+                        customAnswersList.add(qca.getAnswer());
+                    }
                     //customAnswer.setText(msg + questions.size());
                     for(Question q : questions){
                         q.setAnswers(db.answerDao().getAllByQuestionId(q.getId()));
+                        if(q.getId() == 1){
+                            q.setCustomAnswers(customAnswersList);
+                        }
                     }
                     Log.d("Retrieving qa data", "sdcvsdcsdcsd " + qaList.size());
                     runOnUiThread(new Runnable() {
@@ -74,9 +82,11 @@ public class StatisticsActivity extends AppCompatActivity {
                             mAdapter = new StatisticsAdapter(StatisticsActivity.this, qaList, questions);
                             mLayoutManager = new GridLayoutManager(StatisticsActivity.this, 1);
                             mRecyclerView.setLayoutManager(mLayoutManager);
-                            //recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-                            //recyclerView.setItemAnimator(new DefaultItemAnimator());
                             mRecyclerView.setAdapter(mAdapter);
+                            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                                    DividerItemDecoration.VERTICAL);
+                            mRecyclerView.addItemDecoration(dividerItemDecoration);
+                            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
                         }
                     });
                 }catch (Exception e){
@@ -92,6 +102,14 @@ public class StatisticsActivity extends AppCompatActivity {
         // in this example, a LineChart is initialized from xml
         //pieChart = (PieChart) findViewById(R.id.chart);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mRecyclerView.getAdapter() != null){
+            mRecyclerView.getAdapter().notifyDataSetChanged();
+        }
     }
 
     /**

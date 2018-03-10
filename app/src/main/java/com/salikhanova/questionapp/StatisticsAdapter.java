@@ -1,25 +1,29 @@
 package com.salikhanova.questionapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.salikhanova.questionapp.entity.Answer;
 import com.salikhanova.questionapp.entity.Question;
 import com.salikhanova.questionapp.entity.QuestionAnswer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by User on 09.03.2018.
@@ -35,7 +39,7 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public PieChart pieChart;
-        public TextView question, answer1, answer2, answer3, answer4, answer5;
+        public TextView question, answer1, answer2, answer3, answer4, answer5, link;
         public TextView[] answers;
 
         public MyViewHolder(View view) {
@@ -47,6 +51,7 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
             answer3 = view.findViewById(R.id.answer3);
             answer4 = view.findViewById(R.id.answer4);
             answer5 = view.findViewById(R.id.answer5);
+            link = view.findViewById(R.id.link);
             answers = new TextView[]{answer1, answer2, answer3, answer4, answer5};
             Log.d("ADAPTEEEERRRR", "extending ViewHolder");
         }
@@ -89,14 +94,38 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
                 answers.add(qa.getAnswerId());
             }
         }
+        Set<Integer> answersSet = new HashSet<Integer>(answers);
         int occurrences;
-        for(int i=1;i<5;i++){
-            occurrences = Collections.frequency(answers, i);
-            entries.add(new PieEntry(Float.valueOf(occurrences), "Ответ 1"));
+        for(Integer a : answersSet){
+            occurrences = Collections.frequency(answers, a);
+            entries.add(new PieEntry(Float.valueOf(occurrences)));
+        }
+        Integer colorIndexForCustom = 0;
+        if(question.getId() == 1){
+            entries.add(new PieEntry(Float.valueOf(question.getCustomAnswers().size())));
+            colorIndexForCustom = entries.size()-1;
         }
         holder.question.setText(question.getText());
         for(int i = 0; i < question.getAnswers().size(); i++){
-            holder.answers[i].setText(question.getAnswers().get(i).getText());
+            holder.answers[i].setText("--" + question.getAnswers().get(i).getText());
+            holder.answers[i].setTextColor(colors.get(i));
+            if(question.getAnswers().size() == 4){
+                holder.answers[4].setText("--Другие ответы");
+                holder.answers[4].setTextColor(colors.get(colorIndexForCustom));
+                holder.link.setVisibility(View.VISIBLE);
+                holder.link.setMovementMethod(LinkMovementMethod.getInstance());
+                holder.link.setText("Просмотреть другие ответы");
+                holder.link.setTextColor(mContext.getResources().getColor(R.color.colorPrimary));
+                holder.link.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(mContext, CustomAnswerActivity.class);
+                        mContext.startActivity(intent);
+                    }
+                });
+            } else{
+                holder.link.setVisibility(View.INVISIBLE);
+            }
         }
         PieDataSet pieDataSet = new PieDataSet(entries, question.getText());
 
@@ -108,14 +137,20 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
         holder.pieChart.setData(pieData);
         //pieChart.setUsePercentValues(true);
         holder.pieChart.setRotationEnabled(true);
-        holder.pieChart.setCenterText("Всего: " + String.valueOf(answers.size()));
-        holder.pieChart.setCenterTextSize(12);
+        Integer fullQuantity = answers.size();
+        if(question.getId() == 1){
+            fullQuantity += question.getCustomAnswers().size();
+        }
+        holder.pieChart.setCenterText("Всего: " + String.valueOf(fullQuantity));
+        holder.pieChart.setCenterTextSize(14);
         //pieChart.setBackgroundColor(getApplicationContext().getResources().getColor(R.color.colorPrimary));
         holder.pieChart.setDrawEntryLabels(false);
         Description description = new Description();
-        description.setText("Диаграмма для вопроса " + (position+1));
+        description.setText("");
         holder.pieChart.setDescription(description);
-        //holder.pieChart.invalidate();
+        holder.pieChart.getLegend().setEnabled(false);
+        holder.pieChart.notifyDataSetChanged();
+        holder.pieChart.invalidate();
     }
 
     @Override

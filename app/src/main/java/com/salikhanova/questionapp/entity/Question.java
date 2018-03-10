@@ -19,6 +19,9 @@ public class Question {
     @ColumnInfo(name = "text")
     private String text;
 
+    @Ignore
+    private List<Answer> answers;
+
     public List<Answer> getAnswers() {
         return answers;
     }
@@ -28,7 +31,15 @@ public class Question {
     }
 
     @Ignore
-    private List<Answer> answers;
+    private List<String> customAnswers;
+
+    public List<String> getCustomAnswers() {
+        return customAnswers;
+    }
+
+    public void setCustomAnswers(List<String> customAnswers) {
+        this.customAnswers = customAnswers;
+    }
 
     public int getId() {
         return id;
