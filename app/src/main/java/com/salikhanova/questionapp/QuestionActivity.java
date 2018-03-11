@@ -1,9 +1,11 @@
 package com.salikhanova.questionapp;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -114,9 +116,15 @@ public class QuestionActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 answerCustom(view);
+                hideSoftKeyboard(QuestionActivity.this, view);
                 changeQuestion();
             }
         });
+    }
+
+    public static void hideSoftKeyboard (AppCompatActivity activity, View view){
+        InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getApplicationWindowToken(), 0);
     }
 
     private void answer(View view){
@@ -136,6 +144,7 @@ public class QuestionActivity extends AppCompatActivity {
     private void changeQuestion(){
         if(questionIndex >= questions.size()){
             storeAnswers();
+            customAnswer.setText("");
             questionIndex = 0;
         }
         if(questionIndex < questions.size()) {
