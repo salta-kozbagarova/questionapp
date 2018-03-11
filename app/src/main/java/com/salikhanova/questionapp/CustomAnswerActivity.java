@@ -49,10 +49,10 @@ public class CustomAnswerActivity extends AppCompatActivity {
                             mLayoutManager = new GridLayoutManager(CustomAnswerActivity.this, 1);
                             mRecyclerView.setLayoutManager(mLayoutManager);
                             mRecyclerView.setAdapter(mAdapter);
-                            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-                                    DividerItemDecoration.VERTICAL);
-                            mRecyclerView.addItemDecoration(dividerItemDecoration);
-                            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+//                            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+//                                    DividerItemDecoration.VERTICAL);
+//                            mRecyclerView.addItemDecoration(dividerItemDecoration);
+//                            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
                         }
                     });
                 }catch (Exception e){
