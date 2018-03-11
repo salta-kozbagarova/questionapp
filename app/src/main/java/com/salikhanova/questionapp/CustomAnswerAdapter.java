@@ -40,38 +40,28 @@ public class CustomAnswerAdapter extends RecyclerView.Adapter<CustomAnswerAdapte
         public MyViewHolder(View view) {
             super(view);
             customAnswer = view.findViewById(R.id.custom_answer);
-            Log.d("ADAPTEEEERRRR", "extending ViewHolder");
         }
     }
 
     public CustomAnswerAdapter(Context mContext, List<QuestionCustomAnswer> customAnswers) {
         this.mContext = mContext;
         this.customAnswers = customAnswers;
-        Log.d("ADAPTEEEERRRR", "constructor");
     }
 
     @Override
     public CustomAnswerAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.custom_answer_item, parent, false);
-        Log.d("ADAPTEEEERRRR", "onCreateViewHolder");
         return new CustomAnswerAdapter.MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Log.d("ADAPTEEEERRRR", "on bind view holder");
-        Log.d("ADAPTEEEERRRR", "position : " + position);
-        for(QuestionCustomAnswer qca : customAnswers){
-            if(qca.getId() == (position+1)){
-                holder.customAnswer.setText(qca.getAnswer());
-            }
-        }
+        holder.customAnswer.setText(customAnswers.get(position).getAnswer());
     }
 
     @Override
     public int getItemCount() {
-        Log.d("ADAPTEEEERRRR", "got item count");
         return customAnswers.size();
     }
 }

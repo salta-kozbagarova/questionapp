@@ -66,7 +66,6 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
             imageView4 = view.findViewById(R.id.imageView4);
             imageView5 = view.findViewById(R.id.imageView5);
             imageViews = new ImageView[]{imageView1, imageView2, imageView3, imageView4, imageView5};
-            Log.d("ADAPTEEEERRRR", "extending ViewHolder");
         }
     }
 
@@ -79,21 +78,17 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
         colors.add(mContext.getResources().getColor(R.color.pieColor3));
         colors.add(mContext.getResources().getColor(R.color.pieColor4));
         colors.add(mContext.getResources().getColor(R.color.pieColor5));
-        Log.d("ADAPTEEEERRRR", "constructor");
     }
 
     @Override
     public StatisticsAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.statistics_item, parent, false);
-        Log.d("ADAPTEEEERRRR", "onCreateViewHolder");
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
-        Log.d("ADAPTEEEERRRR", "on bind view holder");
-        Log.d("ADAPTEEEERRRR", "position : " + position);
         List<Integer> answers = new ArrayList<>();
         Question question = null;
         for(Question q : questions){
@@ -107,19 +102,12 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
                 answers.add(qa.getAnswerId());
             }
         }
-        Set<Integer> answersSet = new HashSet<Integer>(answers);
         int occurrences;
-        for(Integer a : answersSet){
-            occurrences = Collections.frequency(answers, a);
-            entries.add(new PieEntry(Float.valueOf(occurrences)));
-        }
-        Integer colorIndexForCustom = 0;
-        if(question.getId() == 1){
-            entries.add(new PieEntry(Float.valueOf(question.getCustomAnswers().size())));
-            colorIndexForCustom = entries.size()-1;
-        }
+        Integer colorIndexForCustom = 4;
         holder.question.setText(question.getText());
         for(int i = 0; i < question.getAnswers().size(); i++){
+            occurrences = Collections.frequency(answers, question.getAnswers().get(i).getId());
+            entries.add(new PieEntry(Float.valueOf(occurrences)));
             holder.answers[i].setText(question.getAnswers().get(i).getText());
             Bitmap bitMap = Bitmap.createBitmap(20, 20, Bitmap.Config.ARGB_8888);
             bitMap = bitMap.copy(bitMap.getConfig(), true);
@@ -169,6 +157,9 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
                 });
             }
         }
+        if(question.getId() == 1){
+            entries.add(new PieEntry(Float.valueOf(question.getCustomAnswers().size())));
+        }
         PieDataSet pieDataSet = new PieDataSet(entries, question.getText());
 
         pieDataSet.setColors(colors);
@@ -197,7 +188,6 @@ public class StatisticsAdapter extends RecyclerView.Adapter<StatisticsAdapter.My
 
     @Override
     public int getItemCount() {
-        Log.d("ADAPTEEEERRRR", "got item count");
         return questions.size();
     }
 }

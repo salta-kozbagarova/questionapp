@@ -35,28 +35,19 @@ public class CustomAnswerActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String msg = "Exception ";
                 try {
-                    //rePopulateDb();
                     customAnswers = db.questionCustomAnswerDao().getAll();
-                    Log.d("Retrieving qa data", "sdcvsdcsdcsd " + customAnswers.size());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("Retrieving qa data", "running on ui thread");
-                            //drawChart();
                             mAdapter = new CustomAnswerAdapter(CustomAnswerActivity.this, customAnswers);
                             mLayoutManager = new GridLayoutManager(CustomAnswerActivity.this, 1);
                             mRecyclerView.setLayoutManager(mLayoutManager);
                             mRecyclerView.setAdapter(mAdapter);
-//                            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-//                                    DividerItemDecoration.VERTICAL);
-//                            mRecyclerView.addItemDecoration(dividerItemDecoration);
-//                            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
                         }
                     });
                 }catch (Exception e){
-                    Log.d("Retrieving data", msg + e.getMessage());
+                    Log.d("Retrieving data", e.getMessage());
                 }
             }
         }).start();

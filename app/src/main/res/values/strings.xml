@@ -9,4 +9,5 @@
     <string name="accept">Принять</string>
     <string name="answ">answ</string>
     <string name="quest">quest</string>
+    <string name="clean_all">Отчистить все</string>
 </resources>

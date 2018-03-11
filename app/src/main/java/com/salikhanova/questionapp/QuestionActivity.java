@@ -52,12 +52,9 @@ public class QuestionActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                String msg = "Exception ";
                 try {
-                    //rePopulateDb();
                     questions = db.questionDao().getAll();
                     answers = db.answerDao().getAll();
-                    //customAnswer.setText(msg + questions.size());
                     for(Question q : questions){
                         q.setAnswers(db.answerDao().getAllByQuestionId(q.getId()));
                     }
@@ -68,8 +65,7 @@ public class QuestionActivity extends AppCompatActivity {
                         }
                     });
                 }catch (Exception e){
-                    Log.d("Retrieving data", msg + e.getMessage());
-                    customAnswer.setText(msg + e.getMessage() + e.getStackTrace() + e.getCause());
+                    Log.d("Retrieving data", e.getMessage());
                 }
             }
         }).start();
@@ -168,7 +164,6 @@ public class QuestionActivity extends AppCompatActivity {
     }
 
     private void storeAnswers(){
-        Log.d("STORE ANSWERS", "dvfdfvdfvdfv");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -176,10 +171,11 @@ public class QuestionActivity extends AppCompatActivity {
                     for(QuestionAnswer qa : questAnswers){
                         db.questionAnswerDao().insertAll(qa);
                     }
+                    questAnswers.clear();
                     for(QuestionCustomAnswer qa : questCustAnswers){
                         db.questionCustomAnswerDao().insertAll(qa);
                     }
-                    Log.d("INSERTED ANSWRS SUCCESS", "dvfdfvdfvdfv");
+                    questCustAnswers.clear();
                 }catch (Exception e){
                     Log.d("INSERTING ANSWERS", e.getMessage());
                 }
