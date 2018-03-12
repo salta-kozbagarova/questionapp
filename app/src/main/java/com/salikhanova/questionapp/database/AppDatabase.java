@@ -25,7 +25,7 @@ import com.salikhanova.questionapp.entity.QuestionCustomAnswer;
         Answer.class,
         QuestionAnswer.class,
         QuestionCustomAnswer.class
-}, version = 3)
+}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract QuestionDao questionDao();
     public abstract AnswerDao answerDao();
@@ -40,7 +40,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "questionapp")
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                             /*, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
                             MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
                             MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13*/
@@ -215,8 +215,12 @@ public abstract class AppDatabase extends RoomDatabase {
                     + "`question_id` INTEGER, `answer_id` INTEGER)");
             database.execSQL("CREATE TABLE IF NOT EXISTS `QuestionCustomAnswer` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
                     + "`question_id` INTEGER NOT NULL, `answer` TEXT, "
-                    + "FOREIGN KEY (question_id) REFERENCES Question(id))");
-            database.execSQL("CREATE INDEX index_QuestionCustomAnswer_question_id ON QuestionCustomAnswer(question_id);");
+                    + "FOREIGN KEY (question_id) REFERENCES Question(id));");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_QuestionCustomAnswer_question_id ON QuestionCustomAnswer(question_id);");
+
+            database.execSQL("DELETE FROM Answer;");
+
+            database.execSQL("DELETE FROM Question;");
 
             database.execSQL("INSERT INTO Question (text) VALUES ('Из каких источников вы узнали о ТОО \"ATAYURT\"')");
             database.execSQL("INSERT INTO Answer (text, question_id) "
